@@ -1,5 +1,15 @@
-// API Configuration
-const API_URL = 'http://localhost:8001';
+// API Configuration - Dynamic for both development and production
+function getAPIUrl() {
+    // In production (Render), use the same origin
+    // In development, use localhost:8001
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        return 'http://localhost:8001';
+    }
+    // For production, use the current origin (same domain)
+    return window.location.origin;
+}
+
+const API_URL = getAPIUrl();
 let selectedFile = null;
 let datasetStats = null;
 

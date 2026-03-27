@@ -1,6 +1,7 @@
 from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 import pandas as pd
 import io
 import json
@@ -31,6 +32,11 @@ from what_if_simulator import simulate_scenario, compare_results, generate_expla
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Get environment variables for deployment
+APP_HOST = os.getenv("APP_HOST", "localhost")
+APP_PORT = int(os.getenv("APP_PORT", "8001"))
+ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:8000,http://localhost:8001").split(",")
+
 app = FastAPI()
 
 # Store uploaded files temporarily
@@ -57,18 +63,52 @@ ai_advisor = None
 rag_chatbot = None
 latest_ai_insights_report = {}
 
-# Enable CORS
+# Enable CORS with flexible origins for deployment
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=ALLOWED_ORIGINS + ["*"],  # Include dynamic origins plus wildcard for flexibility
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# Serve static files from frontend directory if it exists
+frontend_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend")
+if os.path.exists(frontend_path):
+    app.mount("/static", StaticFiles(directory=frontend_path), name="static")
+
+# Serve index.html for root and SPA routes
 @app.get("/")
-def read_root():
+async def serve_index():
+    """Serve the frontend index.html"""
+    index_path = os.path.join(frontend_path, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path, media_type="text/html")
     return {"message": "Data Analysis API is running"}
+
+# Serve other HTML files
+@app.get("/{path:path}")
+async def serve_static(path: str):
+    """Serve static files or index.html for SPA routes"""
+    file_path = os.path.join(frontend_path, path)
+    
+    # Check if it's a file that exists
+    if os.path.isfile(file_path):
+        if path.endswith('.html'):
+            return FileResponse(file_path, media_type="text/html")
+        elif path.endswith('.js'):
+            return FileResponse(file_path, media_type="text/javascript")
+        elif path.endswith('.css'):
+            return FileResponse(file_path, media_type="text/css")
+        else:
+            return FileResponse(file_path)
+    
+    # Serve index.html for any route that doesn't have a file (SPA routing)
+    index_path = os.path.join(frontend_path, "index.html")
+    if os.path.exists(index_path) and not path.startswith("api/"):
+        return FileResponse(index_path, media_type="text/html")
+    
+    return {"error": "File not found"}, 404
 
 @app.post("/upload")
 async def upload_file(file: UploadFile = File(...)) -> Dict[str, Any]:
@@ -1939,4 +1979,5 @@ async def answer_question(request: Dict[str, Any]) -> Dict[str, Any]:
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="localhost", port=8001)
+    # Use environment variables for host and port (important for Render deployment)
+    uvicorn.run(app, host=APP_HOST, port=APP_PORT)

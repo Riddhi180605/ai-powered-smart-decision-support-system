@@ -12,3 +12,5 @@ seaborn==0.13.2
 xgboost==2.1.4
 faiss-cpu==1.8.0.post1
 sentence-transformers==3.0.1
+python-dotenv==1.0.0
+groq==0.4.2

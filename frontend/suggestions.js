@@ -1,5 +1,12 @@
-// API Configuration
-const API_URL = 'http://localhost:8001';
+// API Configuration - Dynamic for both development and production
+function getAPIUrl() {
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        return 'http://localhost:8001';
+    }
+    return window.location.origin;
+}
+
+const API_URL = getAPIUrl();
 let mlResults = null;
 let suggestionsData = null;
 let aiInsightsData = null;
