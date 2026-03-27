@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Cleaning - Data Analysis Tool</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧹 Data Cleaning</h1>
+            <p id="fileName" class="file-name"></p>
+        </div>
+
+        <div class="main-content">
+            <!-- Navigation -->
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" id="backBtn">← Back to Analysis</button>
+            </div>
+
+            <!-- Cleaning Summary -->
+            <section class="section">
+                <h2>📋 Cleaning Summary</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">🗑️</div>
+                        <div class="stat-content">
+                            <p class="stat-label">Columns to Delete</p>
+                            <p class="stat-value" id="columnsToDel">-</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-content">
+                            <p class="stat-label">Columns to Fill</p>
+                            <p class="stat-value" id="columnsToFill">-</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📈</div>
+                        <div class="stat-content">
+                            <p class="stat-label">Duplicates to Remove</p>
+                            <p class="stat-value" id="duplicatesToRemove">-</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-content">
+                            <p class="stat-label">Rows Remaining</p>
+                            <p class="stat-value" id="rowsRemaining">-</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- AI Suggestions -->
+            <section class="section">
+                <h2>🤖 AI Cleaning Suggestions</h2>
+                <div class="ai-suggestions-container">
+                    <button class="btn btn-primary" id="getAISuggestions">
+                        🧠 Get AI Suggestions
+                    </button>
+                    <div class="suggestions-result" id="suggestionsResult" style="display: none;">
+                        <h3>AI Recommendations:</h3>
+                        <div id="suggestionsList"></div>
+                        <button class="btn btn-success btn-small" id="applySuggestions">
+                            ✅ Apply AI Suggestions
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Cleaning Options -->
+            <section class="section">
+                <h2>⚙️ Cleaning Options</h2>
+                <div class="options-container">
+                    <div class="option-group">
+                        <label class="option-item">
+                            <input type="checkbox" id="removeDuplicates" checked>
+                            <div class="option-info">
+                                <strong>Remove Duplicate Rows</strong>
+                                <p>Delete rows that are exact duplicates of other rows</p>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div class="option-group">
+                        <label class="option-item">
+                            <input type="checkbox" id="deleteHighMissing" checked>
+                            <div class="option-info">
+                                <strong>Delete Columns with >40% Missing</strong>
+                                <p>Remove columns that have more than 40% missing values</p>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div class="option-group">
+                        <label class="option-item">
+                            <input type="checkbox" id="deleteLowMissing" checked>
+                            <div class="option-info">
+                                <strong>Delete Rows with < 5% Missing</strong>
+                                        <p>Remove rows that have less than 5% missing values</p>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div class="option-group">
+                        <label class="option-item">
+                            <input type="checkbox" id="fillMissing" checked>
+                            <div class="option-info">
+                                <strong>Fill Remaining Missing Values</strong>
+                                <p>Fill missing values using mean (numeric) or mode (categorical)</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Columns Treatment -->
+            <section class="section">
+                <h2>📑 Column Treatment Plan</h2>
+                <div class="table-responsive">
+                    <table class="info-table">
+                        <thead>
+                            <tr>
+                                <th>Column Name</th>
+                                <th>Type</th>
+                                <th>Missing %</th>
+                                <th>Action</th>
+                                <th>Fill Method</th>
+                            </tr>
+                        </thead>
+                        <tbody id="treatmentTable">
+                            <!-- Populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Action Buttons -->
+            <section class="section action-section">
+                <button class="btn btn-primary btn-large" id="confirmCleaning">
+                    ✅ Confirm & Clean
+                </button>
+                <button class="btn btn-secondary btn-large" id="resetBtn">
+                    ↻ Reset Options
+                </button>
+            </section>
+
+            <!-- Loading and Results -->
+            <div class="loading" id="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Cleaning your data...</p>
+            </div>
+
+            <div class="error-message" id="errorMessage" style="display: none;"></div>
+
+            <!-- Cleaning Results -->
+            <section class="section" id="resultsSection" style="display: none;">
+                <h2>✨ Cleaning Results</h2>
+                <div class="results-summary">
+                    <div class="result-item">
+                        <h3>Original Dataset</h3>
+                        <p><strong id="originalRows">0</strong> rows × <strong id="originalCols">0</strong> columns</p>
+                    </div>
+                    <div class="result-item arrow">→</div>
+                    <div class="result-item">
+                        <h3>Cleaned Dataset</h3>
+                        <p><strong id="cleanedRows">0</strong> rows × <strong id="cleanedCols">0</strong> columns</p>
+                    </div>
+                </div>
+
+                <div class="result-changes">
+                    <p><strong>💾 Changes Made:</strong></p>
+                    <ul id="changesList">
+                        <!-- Populated by JavaScript -->
+                    </ul>
+                </div>
+
+                <button class="btn btn-success" id="downloadClearedBtn">
+                    📥 Download Cleaned Data (CSV)
+                </button>
+                <button class="btn btn-secondary" id="viewResultsBtn">
+                    📊 View Detailed Results
+                </button>
+            </section>
+        </div>
+
+        <div class="footer">
+            <p>Data Cleaning Tool v1.0</p>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmationModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>⚠️ Confirm Cleaning Options</h2>
+                <span class="close" id="closeModal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <h3>Review Your Cleaning Plan:</h3>
+                <div id="confirmationSummary" class="confirmation-summary">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelBtn">❌ Cancel</button>
+                <button class="btn btn-primary" id="proceedBtn">✅ Proceed to Clean</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="cleaning.js"></script>
+    <script src="chatbot-widget.js"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            initializeCleaningPage();
+        });
+    </script>
+</body>
+
+</html>

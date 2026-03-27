@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Suggestions - Data Analysis Tool</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .suggestions-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .suggestion-card {
+            background: white;
+            border-left: 5px solid #3498db;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .suggestion-card:hover {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .suggestion-card.info {
+            border-left-color: #3498db;
+            background: linear-gradient(135deg, #f0f8ff 0%, #fff 100%);
+        }
+
+        .suggestion-card.success {
+            border-left-color: #27ae60;
+            background: linear-gradient(135deg, #f0fff4 0%, #fff 100%);
+        }
+
+        .suggestion-card.warning {
+            border-left-color: #f39c12;
+            background: linear-gradient(135deg, #fffbf0 0%, #fff 100%);
+        }
+
+        .suggestion-card.danger {
+            border-left-color: #e74c3c;
+            background: linear-gradient(135deg, #fff5f5 0%, #fff 100%);
+        }
+
+        .suggestion-card h3 {
+            color: #2c3e50;
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .suggestion-card h4 {
+            color: #34495e;
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+
+        .suggestion-card h5 {
+            color: #334155;
+            margin-top: 12px;
+            margin-bottom: 8px;
+        }
+
+        .suggestion-text {
+            color: #555;
+            line-height: 1.8;
+            margin: 10px 0;
+            font-size: 0.95em;
+        }
+
+        #aiInsightsContent p,
+        #aiInsightsContent li,
+        #aiInsightsContent div {
+            color: #475569;
+        }
+
+        #aiInsightsContent h4,
+        #aiInsightsContent h5 {
+            color: #334155;
+        }
+
+        #aiInsightsContent strong {
+            color: #1f2937;
+        }
+
+        #aiInsightsContent ul,
+        #aiInsightsContent ol {
+            margin: 8px 0;
+            padding-left: 20px;
+        }
+
+        #aiInsightsContent .impact-badge {
+            color: #ffffff;
+        }
+
+        .insight-stat-box {
+            margin-top: 15px;
+            padding: 12px;
+            background: #f3f7fb;
+            border: 1px solid #dbe4ec;
+            border-radius: 6px;
+        }
+
+        .roadmap-phase {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #dbe4ec;
+            border-radius: 8px;
+            background: #f8fafc;
+        }
+
+        .impact-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin: 5px 5px 5px 0;
+        }
+
+        .impact-high {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .impact-medium {
+            background: #f39c12;
+            color: white;
+        }
+
+        .impact-low {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .feature-recommendation {
+            background: #fafafa;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 6px;
+            border-left: 4px solid #3498db;
+        }
+
+        .feature-name {
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 1.1em;
+        }
+
+        .recommendation-text {
+            color: #555;
+            margin: 5px 0;
+            line-height: 1.6;
+        }
+
+        .direction-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+
+        .direction-up {
+            background: #27ae60;
+            color: white;
+        }
+
+        .direction-down {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .model-score {
+            font-size: 2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 15px 0;
+        }
+
+        .score-explanation-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .score-explanation-list li {
+            padding: 10px 0;
+            padding-left: 30px;
+            position: relative;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .score-explanation-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #27ae60;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            border-bottom: 2px solid #ecf0f1;
+            flex-wrap: wrap;
+        }
+
+        .tab-button {
+            padding: 12px 20px;
+            background: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: #7f8c8d;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            font-size: 0.95em;
+            border-radius: 8px 8px 0 0;
+            min-width: 180px;
+            text-align: center;
+        }
+
+        .tab-button:hover {
+            color: #2c3e50;
+            background: #f9f9f9;
+        }
+
+        .tab-button.active {
+            color: #3498db;
+            border-bottom-color: #3498db;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            border: 5px solid #ecf0f1;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .error-section {
+            background: #ffe8e8;
+            border: 1px solid #e74c3c;
+            color: #c0392b;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+
+        .nav-buttons {
+            margin: 20px 0;
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-buttons #backBtn {
+            margin-left: 8px;
+        }
+
+        .home-icon-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 11px 18px;
+            min-height: 44px;
+            text-decoration: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #0f766e 0%, #0891b2 52%, #2563eb 100%);
+            color: #ffffff !important;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+            box-shadow: 0 8px 20px rgba(14, 116, 144, 0.32);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            min-width: 190px;
+        }
+
+        .home-icon-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(14, 116, 144, 0.4);
+        }
+
+        .home-icon-btn:focus-visible {
+            outline: 2px solid #22d3ee;
+            outline-offset: 2px;
+        }
+
+        .nav-buttons #whatIfNavBtn {
+            margin-left: auto;
+        }
+
+        .dataset-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .summary-box {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #ecf0f1;
+        }
+
+        .summary-box h4 {
+            color: #34495e;
+            margin-top: 0;
+            font-size: 0.9em;
+        }
+
+        .summary-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #3498db;
+        }
+
+        .model-compare-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            border: 1px solid rgba(34, 211, 238, 0.28);
+            border-radius: 8px;
+            overflow: hidden;
+            background: rgba(11, 31, 58, 0.74);
+        }
+
+        .model-compare-table th,
+        .model-compare-table td {
+            padding: 10px;
+            border: 1px solid rgba(34, 211, 238, 0.2);
+            color: #E2E8F0;
+        }
+
+        .model-compare-table th {
+            text-align: left;
+            background: rgba(37, 99, 235, 0.35);
+            font-weight: 700;
+        }
+
+        .model-status-cell {
+            text-align: center;
+        }
+
+        .model-selected-row {
+            background: rgba(34, 197, 94, 0.14);
+        }
+
+        .model-error-cell {
+            text-align: center;
+            color: #fca5a5 !important;
+            font-weight: 600;
+        }
+
+        .rag-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 10px 0 15px;
+        }
+
+        .rag-status {
+            font-size: 0.95em;
+            color: #2c3e50;
+            margin-top: 8px;
+        }
+
+        .chat-input-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+
+        .chat-input-row input {
+            flex: 1;
+            min-width: 240px;
+            padding: 12px 14px;
+            border: 1px solid #bdc3c7;
+            border-radius: 8px;
+            font-size: 0.95em;
+        }
+
+        .chat-log {
+            max-height: 420px;
+            overflow-y: auto;
+            border: 1px solid #ecf0f1;
+            border-radius: 8px;
+            background: #f8fafc;
+            padding: 12px;
+        }
+
+        .chat-message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            line-height: 1.55;
+            white-space: pre-wrap;
+        }
+
+        .chat-message.user {
+            background: #dff0ff;
+            border-left: 4px solid #3498db;
+        }
+
+        .chat-message.assistant {
+            background: #f1f8ec;
+            border-left: 4px solid #27ae60;
+        }
+
+        .chat-message.system {
+            background: #fff8e8;
+            border-left: 4px solid #f39c12;
+        }
+
+        .retrieved-context {
+            margin-top: 14px;
+            border-top: 1px dashed #dfe6e9;
+            padding-top: 10px;
+        }
+
+        .retrieved-context details {
+            margin-bottom: 8px;
+            background: #ffffff;
+            border: 1px solid #ecf0f1;
+            border-radius: 6px;
+            padding: 8px 10px;
+        }
+
+        .retrieved-context summary {
+            cursor: pointer;
+            color: #34495e;
+            font-weight: 600;
+        }
+
+        .whatif-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .whatif-grid label {
+            display: block;
+            margin-bottom: 6px;
+            color: #34495e;
+            font-weight: 600;
+        }
+
+        .whatif-grid input,
+        .whatif-grid select {
+            padding: 10px 12px;
+            border: 1px solid #bdc3c7;
+            border-radius: 8px;
+            font-size: 0.95em;
+            width: 100%;
+            color: #2c3e50;
+            background: #ffffff;
+        }
+
+        .whatif-grid input::placeholder {
+            color: #7f8c8d;
+        }
+
+        #whatIfRowHelp,
+        #whatIfModeHelp {
+            color: #4b5563 !important;
+        }
+
+        .change-list {
+            margin-top: 10px;
+            border: 1px solid #ecf0f1;
+            border-radius: 8px;
+            background: #f8fafc;
+            padding: 10px;
+        }
+
+        .change-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 10px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            background: #ffffff;
+            border: 1px solid #ecf0f1;
+            gap: 10px;
+            color: #2c3e50;
+        }
+
+        .change-item strong {
+            color: #1f2937;
+        }
+
+        .change-item button {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 8px;
+            background: #e74c3c;
+            color: white;
+            cursor: pointer;
+            min-width: 110px;
+            min-height: 38px;
+        }
+
+        .whatif-result-box {
+            background: #f9f9f9;
+            border: 1px solid #e0e6eb;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 12px;
+            color: #2c3e50;
+        }
+
+        .whatif-result-box h4 {
+            color: #334155;
+            margin: 0 0 8px;
+        }
+
+        .howto-box {
+            background: #eef7ff;
+            border: 1px solid #cfe5ff;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 10px 0 14px;
+        }
+
+        .howto-box h4 {
+            margin: 0 0 8px;
+            color: #1f4e79;
+        }
+
+        .howto-box ol {
+            margin: 0;
+            padding-left: 18px;
+            color: #2c3e50;
+        }
+
+        .quick-presets {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 8px 0;
+        }
+
+        .quick-presets button {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid #d6e4f0;
+            background: #fff;
+            cursor: pointer;
+            font-size: 0.88em;
+            min-width: 90px;
+            min-height: 36px;
+        }
+
+        .whatif-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .whatif-header h3 {
+            margin: 0;
+        }
+
+        .whatif-close-btn {
+            border: 1px solid #d0d7de;
+            background: #fff;
+            color: #334155;
+            border-radius: 8px;
+            padding: 6px 12px;
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: 600;
+            min-width: 100px;
+            min-height: 36px;
+        }
+
+        .whatif-close-btn:hover {
+            background: #f8fafc;
+        }
+
+        body.whatif-focus::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.22);
+            backdrop-filter: blur(3px);
+            z-index: 900;
+        }
+
+        body.whatif-focus .header,
+        body.whatif-focus .nav-buttons {
+            filter: blur(3px);
+            opacity: 0.45;
+        }
+
+        body.whatif-focus #contentContainer>*:not(#what-if) {
+            filter: blur(4px);
+            opacity: 0.3;
+        }
+
+        body.whatif-focus #what-if.active {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: min(1050px, 92vw);
+            max-height: 86vh;
+            overflow-y: auto;
+            z-index: 1001;
+            margin: 0;
+            padding: 2px;
+        }
+
+        body.whatif-focus #what-if .suggestion-card {
+            margin: 0;
+            box-shadow: 0 20px 48px rgba(0, 0, 0, 0.26);
+        }
+
+        @media (max-width: 768px) {
+            body.whatif-focus #what-if.active {
+                width: 96vw;
+                max-height: 88vh;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💡 AI Suggestions & Insights</h1>
+            <p>Get actionable insights and recommendations to improve your model and data</p>
+        </div>
+
+        <div class="main-content suggestions-container">
+            <!-- Navigation -->
+            <div class="nav-buttons">
+                <a class="btn btn-secondary home-icon-btn" href="index.html" title="Go to Home"
+                    aria-label="Go to Home">🏠 Home</a>
+                <button class="btn btn-secondary" id="backBtn">← Back to Model Training</button>
+                <button class="btn btn-primary" id="whatIfNavBtn" onclick="switchTab('what-if')">🧪 What-If
+                    Simulation</button>
+            </div>
+
+            <!-- Loading State -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Generating AI Suggestions...</p>
+                <p class="loading-text">Analyzing your model and data...</p>
+            </div>
+
+            <!-- Error State -->
+            <div class="error-section" id="errorMessage" style="display: none;"></div>
+
+            <!-- Content Container -->
+            <div id="contentContainer" style="display: none;">
+                <!-- Problem Type Section -->
+                <div class="suggestion-card info">
+                    <h3>📋 Problem Type Analysis</h3>
+                    <div class="recommendation-text" id="problemTypeAnalysis"></div>
+                </div>
+
+                <!-- Tabs -->
+                <div class="tabs">
+                    <button class="tab-button active" onclick="switchTab('features')">🎯 Feature Impact</button>
+                    <button class="tab-button" onclick="switchTab('improvements')">📈 Improvement Tips</button>
+                    <button class="tab-button" onclick="switchTab('model')">🤖 Model Selection</button>
+                    <button class="tab-button" onclick="switchTab('data')">📊 Data Suggestions</button>
+                    <button class="tab-button" onclick="switchTab('ai-insights')">🧠 AI-Powered Insights</button>
+                </div>
+
+                <!-- Tab 1: Feature Impact -->
+                <div id="features" class="tab-content active">
+                    <div class="suggestion-card success">
+                        <h3>⭐ Most Impactful Features</h3>
+                        <div class="dataset-summary">
+                            <div class="summary-box">
+                                <h4>Top Feature</h4>
+                                <div class="summary-value" id="topFeature">-</div>
+                            </div>
+                            <div class="summary-box">
+                                <h4>Impact Score</h4>
+                                <div class="summary-value" id="topFeatureScore">-</div>
+                            </div>
+                        </div>
+                        <div id="featureImportanceList"></div>
+                    </div>
+                </div>
+
+                <!-- Tab 2: Improvement Tips -->
+                <div id="improvements" class="tab-content">
+                    <div class="suggestion-card warning">
+                        <h3>📈 How to Improve Your Target Column</h3>
+                        <p class="suggestion-text">Based on feature correlations with your target column:</p>
+                        <div id="improvementRecommendations"></div>
+                    </div>
+
+                    <div class="suggestion-card info">
+                        <h3>💡 Key Insights</h3>
+                        <div id="keyInsights"></div>
+                    </div>
+                </div>
+
+                <div id="model" class="tab-content">
+                    <div class="suggestion-card success">
+                        <h3>🏆 Why This Model Was Selected</h3>
+                        <div class="model-score" id="modelScore">-</div>
+                        <p class="suggestion-text"><strong>Model Name:</strong> <span id="selectedModel">-</span></p>
+                        <h4>Reasons for Selection:</h4>
+                        <ul class="score-explanation-list" id="modelReasons"></ul>
+                    </div>
+
+                    <div class="suggestion-card info">
+                        <h3>📊 Model Comparison</h3>
+                        <div id="modelComparison"></div>
+                    </div>
+                </div>
+
+                <!-- Tab 4: Data Suggestions -->
+                <div id="data" class="tab-content">
+                    <div class="suggestion-card warning">
+                        <h3>📊 Dataset & Feature Recommendations</h3>
+                        <div id="dataSuggestions"></div>
+                    </div>
+
+                    <div class="suggestion-card info">
+                        <h3>📈 Current Dataset Status</h3>
+                        <div class="dataset-summary" id="datasetStatus"></div>
+                    </div>
+                </div>
+
+                <!-- Tab 5: AI-Powered Insights -->
+                <div id="ai-insights" class="tab-content">
+                    <div class="suggestion-card success">
+                        <h3>🧠 AI-Powered Business Intelligence</h3>
+                        <p class="suggestion-text">Advanced insights generated using Groq-hosted LLMs and SHAP analysis
+                            for
+                            deeper understanding of your model's predictions.</p>
+                        <button class="btn btn-primary" id="generateAIInsightsBtn">🚀 Generate AI Insights</button>
+                    </div>
+
+                    <!-- AI Insights Content -->
+                    <div id="aiInsightsContent" style="display: none;">
+                        <div class="suggestion-card info">
+                            <h3>💭 Prediction Interpretation</h3>
+                            <div id="predictionInterpretation"></div>
+                        </div>
+
+                        <div class="suggestion-card warning">
+                            <h3>🔍 Feature Analysis</h3>
+                            <div id="featureAnalysis"></div>
+                        </div>
+
+                        <div class="suggestion-card success">
+                            <h3>📈 Trend Comparison</h3>
+                            <div id="trendComparison"></div>
+                        </div>
+
+                        <div class="suggestion-card danger">
+                            <h3>🎯 Actionable Recommendations</h3>
+                            <div id="actionableRecommendations"></div>
+                        </div>
+
+                        <!-- Risk Assessment -->
+                        <div class="suggestion-card warning" id="riskAssessmentSection" style="display: none;">
+                            <h3>⚠️ Risk Assessment</h3>
+                            <div id="riskAssessment"></div>
+                        </div>
+
+                        <!-- Implementation Roadmap -->
+                        <div class="suggestion-card info" id="roadmapSection" style="display: none;">
+                            <h3>🗺️ Implementation Roadmap</h3>
+                            <div id="implementationRoadmap"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 7: What-If Simulation -->
+                <div id="what-if" class="tab-content">
+                    <div class="suggestion-card success">
+                        <div class="whatif-header">
+                            <h3>🧪 What-If Scenario Simulation</h3>
+                            <button class="whatif-close-btn" type="button" onclick="closeWhatIfFocus()">✕ Close</button>
+                        </div>
+                        <p class="suggestion-text">Test "what happens if I change this feature?" and instantly compare
+                            old vs new prediction.</p>
+
+                        <div class="howto-box">
+                            <h4>How to use (3 simple steps)</h4>
+                            <ol>
+                                <li>Choose a row index (optional). If empty, default values are used.</li>
+                                <li>Select one or more feature changes, then click <strong>Add Change</strong>.</li>
+                                <li>Click <strong>Run Simulation</strong> to see old prediction, new prediction, and
+                                    plain-language insight.</li>
+                            </ol>
+                        </div>
+
+                        <div class="whatif-grid">
+                            <div>
+                                <label for="whatIfRowIndex">1) Dataset Row Number</label>
+                                <input type="number" id="whatIfRowIndex" min="0" placeholder="Example: 0" />
+                                <p class="suggestion-text" id="whatIfRowHelp" style="margin:6px 0 0; font-size:0.85em;">
+                                    Row index starts at 0. Example: first row = 0, second row = 1.</p>
+                            </div>
+                            <div>
+                                <label for="whatIfFeature">2) Feature</label>
+                                <select id="whatIfFeature"></select>
+                            </div>
+                            <div>
+                                <label for="whatIfMode">3) Change Type</label>
+                                <select id="whatIfMode">
+                                    <option value="set">Set exact value</option>
+                                    <option value="add">Increase/Decrease by amount</option>
+                                    <option value="percent">Increase/Decrease by %</option>
+                                </select>
+                                <p class="suggestion-text" id="whatIfModeHelp"
+                                    style="margin:6px 0 0; font-size:0.85em;"></p>
+                            </div>
+                            <div>
+                                <label for="whatIfValue">4) Value</label>
+                                <input type="text" id="whatIfValue" placeholder="Example: +20 or 50" />
+                                <select id="whatIfCategoryValue" style="display:none;"></select>
+                            </div>
+                        </div>
+
+                        <div class="whatif-result-box" id="whatIfRowPreview" style="display:none;"></div>
+
+                        <div class="quick-presets" id="whatIfQuickPresets">
+                            <button type="button" data-preset="percent:+10">+10%</button>
+                            <button type="button" data-preset="percent:+20">+20%</button>
+                            <button type="button" data-preset="percent:-10">-10%</button>
+                            <button type="button" data-preset="add:+1">+1</button>
+                            <button type="button" data-preset="add:-1">-1</button>
+                        </div>
+
+                        <div class="rag-controls">
+                            <button class="btn btn-secondary" id="addWhatIfChangeBtn">Add Change</button>
+                            <button class="btn btn-secondary" id="clearWhatIfChangesBtn">Clear All</button>
+                            <button class="btn btn-primary" id="runWhatIfBtn">Run Simulation</button>
+                        </div>
+
+                        <div class="change-list" id="whatIfChangeList"></div>
+
+                        <div class="whatif-result-box" id="whatIfResults" style="display:none;"></div>
+                    </div>
+                </div>
+
+                <!-- General Insights -->
+                <div class="suggestion-card info">
+                    <h3>🔍 General Recommendations</h3>
+                    <div id="generalRecommendations"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="suggestions.js"></script>
+    <script src="chatbot-widget.js"></script>
+</body>
+
+</html>

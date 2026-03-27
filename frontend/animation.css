@@ -1,0 +1,375 @@
+:root {
+    --anim-fast: 0.32s;
+    --anim-base: 0.42s;
+    --anim-slow: 0.56s;
+    --anim-ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --anim-glow: rgba(34, 211, 238, 0.35);
+    --anim-border-glow: rgba(34, 211, 238, 0.5);
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    opacity: 0;
+    animation: pageFadeIn var(--anim-base) var(--anim-ease) forwards;
+    will-change: opacity;
+}
+
+body.page-ready {
+    opacity: 1;
+}
+
+@keyframes pageFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideFadeIn {
+    from {
+        opacity: 0;
+        transform: translate3d(0, 20px, 0);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+    }
+}
+
+@keyframes chartRise {
+    from {
+        opacity: 0;
+        transform: translate3d(0, 14px, 0) scale(0.985);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0) scale(1);
+    }
+}
+
+.a-fade-up {
+    opacity: 0;
+    transform: translate3d(0, 20px, 0);
+    will-change: transform, opacity;
+}
+
+.a-fade-up.is-visible {
+    animation: slideFadeIn var(--anim-base) var(--anim-ease) forwards;
+}
+
+.stagger-item {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0);
+    will-change: transform, opacity;
+}
+
+.stagger-item.is-visible {
+    animation: slideFadeIn var(--anim-base) var(--anim-ease) forwards;
+    animation-delay: var(--stagger-delay, 0ms);
+}
+
+.section,
+.stat-card,
+.summary-card,
+.suggestion-card,
+.option-group,
+.comparison-box,
+.result-item,
+.table-responsive,
+.results-table,
+.model-compare-table,
+.ai-suggestions-container,
+.upload-section {
+    transition: transform var(--anim-base) var(--anim-ease),
+        box-shadow var(--anim-base) ease,
+        border-color var(--anim-fast) ease,
+        background-color var(--anim-fast) ease;
+    transform: translateZ(0);
+}
+
+.section:hover,
+.stat-card:hover,
+.summary-card:hover,
+.suggestion-card:hover,
+.option-group:hover,
+.comparison-box:hover,
+.result-item:hover,
+.table-responsive:hover,
+.results-table:hover,
+.model-compare-table:hover,
+.ai-suggestions-container:hover,
+.upload-section:hover {
+    transform: translate3d(0, -4px, 0);
+    box-shadow: 0 16px 34px rgba(2, 6, 23, 0.26);
+    border-color: var(--anim-border-glow);
+}
+
+.section,
+.table-responsive,
+.option-group,
+.summary-card,
+.suggestion-card,
+.results-table,
+.model-compare-table,
+.comparison-box {
+    position: relative;
+    overflow: hidden;
+}
+
+.section::after,
+.table-responsive::after,
+.option-group::after,
+.summary-card::after,
+.suggestion-card::after,
+.results-table::after,
+.model-compare-table::after,
+.comparison-box::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    border: 1px solid transparent;
+    transition: border-color var(--anim-fast) ease;
+    pointer-events: none;
+}
+
+.section:hover::after,
+.table-responsive:hover::after,
+.option-group:hover::after,
+.summary-card:hover::after,
+.suggestion-card:hover::after,
+.results-table:hover::after,
+.model-compare-table:hover::after,
+.comparison-box:hover::after {
+    border-color: var(--anim-border-glow);
+}
+
+.btn,
+.tab-button,
+.whatif-close-btn,
+.quick-presets button,
+.change-item button,
+.cbot-close,
+.cbot-input-wrap button,
+.home-icon-btn {
+    position: relative;
+    overflow: hidden;
+    transform: translateZ(0);
+    transition: transform var(--anim-fast) var(--anim-ease),
+        box-shadow var(--anim-fast) ease,
+        background-color var(--anim-fast) ease,
+        color var(--anim-fast) ease,
+        border-color var(--anim-fast) ease;
+    will-change: transform;
+}
+
+.btn:hover,
+.tab-button:hover,
+.whatif-close-btn:hover,
+.quick-presets button:hover,
+.change-item button:hover,
+.cbot-close:hover,
+.cbot-input-wrap button:hover,
+.home-icon-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 24px var(--anim-glow);
+}
+
+.btn:active,
+.tab-button:active,
+.whatif-close-btn:active,
+.quick-presets button:active,
+.change-item button:active,
+.cbot-close:active,
+.cbot-input-wrap button:active,
+.home-icon-btn:active,
+.btn.is-pressed {
+    transform: scale(0.98);
+    transition-duration: 0.16s;
+}
+
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    transform: scale(0);
+    background: rgba(255, 255, 255, 0.35);
+    pointer-events: none;
+    animation: rippleEffect 0.58s ease-out;
+}
+
+@keyframes rippleEffect {
+    to {
+        transform: scale(4.2);
+        opacity: 0;
+    }
+}
+
+.nav-buttons {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    transition: max-height var(--anim-base) var(--anim-ease), opacity var(--anim-fast) ease;
+}
+
+.nav-buttons .btn,
+.nav-buttons .tab-button,
+.nav-buttons .home-icon-btn {
+    border: 1px solid transparent;
+}
+
+.nav-buttons .btn:hover,
+.nav-buttons .tab-button:hover,
+.nav-buttons .home-icon-btn:hover {
+    border-color: rgba(34, 211, 238, 0.55);
+    background-color: rgba(34, 211, 238, 0.1);
+}
+
+.nav-buttons .btn.is-active,
+.nav-buttons .tab-button.is-active,
+.nav-buttons .home-icon-btn.is-active {
+    border-color: rgba(34, 211, 238, 0.8);
+    box-shadow: 0 10px 22px rgba(34, 211, 238, 0.22);
+}
+
+.nav-buttons .btn.is-active::after,
+.nav-buttons .tab-button.is-active::after,
+.nav-buttons .home-icon-btn.is-active::after {
+    content: "";
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    bottom: 4px;
+    height: 2px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, rgba(34, 211, 238, 0.35) 0%, rgba(34, 211, 238, 1) 50%, rgba(34, 211, 238, 0.35) 100%);
+    transform-origin: center;
+    animation: activeIndicator var(--anim-base) var(--anim-ease);
+}
+
+@keyframes activeIndicator {
+    from {
+        transform: scaleX(0.4);
+        opacity: 0;
+    }
+
+    to {
+        transform: scaleX(1);
+        opacity: 1;
+    }
+}
+
+.nav-collapse-toggle {
+    display: none;
+    margin-bottom: 12px;
+}
+
+@media (max-width: 860px) {
+    .nav-collapse-toggle {
+        display: inline-flex;
+    }
+
+    .nav-buttons {
+        max-height: 360px;
+        overflow: hidden;
+        opacity: 1;
+    }
+
+    .nav-buttons.is-collapsed {
+        max-height: 0;
+        opacity: 0;
+        margin-bottom: 0;
+        pointer-events: none;
+    }
+}
+
+input,
+select,
+textarea,
+.form-control,
+.chat-input-row input,
+.whatif-grid input,
+.whatif-grid select,
+.cbot-input-wrap input {
+    transition: border-color var(--anim-fast) ease,
+        box-shadow var(--anim-fast) ease,
+        background-color var(--anim-fast) ease,
+        transform var(--anim-fast) ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus,
+.form-control:focus,
+.chat-input-row input:focus,
+.whatif-grid input:focus,
+.whatif-grid select:focus,
+.cbot-input-wrap input:focus {
+    box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.2), 0 0 0 8px rgba(34, 211, 238, 0.08);
+    border-color: rgba(34, 211, 238, 0.88);
+}
+
+input::placeholder,
+textarea::placeholder,
+.chat-input-row input::placeholder,
+.whatif-grid input::placeholder,
+.cbot-input-wrap input::placeholder {
+    transition: opacity var(--anim-fast) ease, transform var(--anim-fast) ease;
+}
+
+input:focus::placeholder,
+textarea:focus::placeholder,
+.chat-input-row input:focus::placeholder,
+.whatif-grid input:focus::placeholder,
+.cbot-input-wrap input:focus::placeholder {
+    opacity: 0.45;
+    transform: translateX(2px);
+}
+
+input.is-typing,
+textarea.is-typing,
+.form-control.is-typing,
+.chat-input-row input.is-typing,
+.whatif-grid input.is-typing {
+    border-color: rgba(34, 211, 238, 0.74);
+}
+
+.progress-fill {
+    transition: width var(--anim-slow) var(--anim-ease);
+}
+
+.chart-animate {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0) scale(0.985);
+}
+
+.chart-animate.chart-visible {
+    animation: chartRise var(--anim-slow) var(--anim-ease) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation: none !important;
+        transition-duration: 0.01ms !important;
+        transition-delay: 0ms !important;
+    }
+
+    body {
+        opacity: 1;
+    }
+}

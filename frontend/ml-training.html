@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ML Model Training - Data Analysis Tool</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Machine Learning Training</h1>
+            <p>Train multiple ML models on your cleaned dataset and find the best performer</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Navigation -->
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" id="backBtn">← Back to Cleaning</button>
+            </div>
+
+            <!-- Target Column Selection -->
+            <div class="section" id="targetSelection">
+                <h2>Select Target Column</h2>
+                <div id="dataStatus"
+                    style="margin-bottom: 15px; padding: 10px; background: #e8f5e8; border: 1px solid #4CAF50; border-radius: 4px; color: #2E7D32;">
+                    ✅ Dataset loaded successfully! Select a target column to predict.
+                </div>
+                <div class="form-group">
+                    <label for="targetColumn">Choose the column you want to predict:</label>
+                    <select id="targetColumn" class="form-control">
+                        <option value="">Select target column...</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" id="trainBtn">🚀 Train ML Models</button>
+            </div>
+
+            <!-- Loading -->
+            <div class="loading" id="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Training machine learning models...</p>
+                <p class="loading-text">This may take a few moments...</p>
+            </div>
+
+            <!-- Error Message -->
+            <div class="error-message" id="errorMessage" style="display: none;"></div>
+
+            <!-- Success Message -->
+            <div id="successMessage"
+                style="display: none; margin: 12px 0; padding: 10px; background: #e8f5e8; border: 1px solid #4CAF50; border-radius: 4px; color: #2E7D32;">
+            </div>
+
+            <!-- Results Section -->
+            <div class="section" id="resultsSection" style="display: none;">
+                <h2>🎯 Training Results</h2>
+
+                <div class="results-summary">
+                    <div class="summary-card">
+                        <h3>Dataset Info</h3>
+                        <p><strong>Problem Type:</strong> <span id="problemType"></span></p>
+                        <p><strong>Target Column:</strong> <span id="targetCol"></span></p>
+                        <p><strong>Total Samples:</strong> <span id="totalSamples"></span></p>
+                        <p><strong>Features:</strong> <span id="numFeatures"></span></p>
+                        <p><strong>Train/Test Split:</strong> <span id="trainTestSplit"></span></p>
+                    </div>
+
+                    <div class="summary-card best-model">
+                        <h3>🏆 Best Model</h3>
+                        <p class="best-model-name" id="bestModelName"></p>
+                        <p id="bestModelScore"></p>
+                    </div>
+                </div>
+
+                <h3>Model Performance Comparison</h3>
+                <div class="models-comparison" id="modelsComparison"></div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-success" id="downloadModelBtn">💾 Download Best Model</button>
+                    <button class="btn btn-primary" id="suggestionsBtn">💡 Show AI Suggestions</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="ml-training.js"></script>
+    <script src="chatbot-widget.js"></script>
+</body>
+
+</html>
