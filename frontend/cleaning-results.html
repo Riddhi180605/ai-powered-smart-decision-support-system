@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cleaning Results - Data Analysis Tool</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .results-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .cleaning-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .summary-card.success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+
+        .summary-card.warning {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .summary-card.info {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .summary-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .summary-value {
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .summary-detail {
+            font-size: 12px;
+            margin-top: 8px;
+            opacity: 0.8;
+        }
+
+        .changes-section {
+            background: rgba(11, 31, 58, 0.72);
+            border: 1px solid rgba(34, 211, 238, 0.2);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .changes-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .changes-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(34, 211, 238, 0.22);
+            display: flex;
+            align-items: center;
+            color: #E2E8F0;
+        }
+
+        .changes-list li:last-child {
+            border-bottom: none;
+        }
+
+        .changes-list li:before {
+            content: "✓";
+            color: #4CAF50;
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 18px;
+        }
+
+        .sample-data-section {
+            margin-bottom: 30px;
+        }
+
+        .sample-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #E2E8F0;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid rgba(34, 211, 238, 0.24);
+        }
+
+        .sample-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(15, 23, 42, 0.88);
+            color: #E2E8F0;
+        }
+
+        .sample-table thead {
+            background: #667eea;
+            color: white;
+        }
+
+        .sample-table th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .sample-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(34, 211, 238, 0.14);
+        }
+
+        .sample-table tbody tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .sample-table tbody tr:hover {
+            background: rgba(34, 211, 238, 0.09);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+
+        .btn-success {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #45a049;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .comparison-box {
+            border: 2px solid rgba(34, 211, 238, 0.22);
+            background: rgba(11, 31, 58, 0.62);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .comparison-box h3 {
+            margin-top: 0;
+            color: #E2E8F0;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(34, 211, 238, 0.18);
+        }
+
+        .stat-row:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            color: #94A3B8;
+        }
+
+        .stat-value {
+            font-weight: bold;
+            color: #E2E8F0;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #94A3B8;
+            background: rgba(11, 31, 58, 0.62);
+            border: 1px solid rgba(34, 211, 238, 0.2);
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 768px) {
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .summary-value {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>✨ Data Cleaning Completed</h1>
+            <p id="fileName" class="file-name"></p>
+        </div>
+
+        <div class="main-content results-container">
+            <!-- Navigation -->
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" id="backBtn">← Back to Cleaning</button>
+                <button class="btn btn-secondary" id="homeBtn">🏠 Home</button>
+            </div>
+
+            <!-- Success Message -->
+            <div
+                style="background: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 15px; border-radius: 6px; margin-bottom: 20px; text-align: center;">
+                <strong>🎉 Success!</strong> Your data has been cleaned successfully. Here's a summary.
+            </div>
+
+            <!-- Comparison Section -->
+            <div class="comparison-grid">
+                <div class="comparison-box">
+                    <h3>📊 Original Dataset</h3>
+                    <div class="stat-row">
+                        <span class="stat-label">Total Rows:</span>
+                        <span class="stat-value" id="origRows">-</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Total Columns:</span>
+                        <span class="stat-value" id="origCols">-</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Missing Values:</span>
+                        <span class="stat-value" id="origMissing">-</span>
+                    </div>
+                </div>
+
+                <div class="comparison-box">
+                    <h3>✨ Cleaned Dataset</h3>
+                    <div class="stat-row">
+                        <span class="stat-label">Total Rows:</span>
+                        <span class="stat-value" id="cleanedRows">-</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Total Columns:</span>
+                        <span class="stat-value" id="cleanedCols">-</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Missing Values:</span>
+                        <span class="stat-value" id="cleanedMissing">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="cleaning-summary">
+                <div class="summary-card">
+                    <div class="summary-label">Rows Removed</div>
+                    <div class="summary-value" id="rowsRemoved">-</div>
+                    <div class="summary-detail">Duplicates & missing data</div>
+                </div>
+
+                <div class="summary-card success">
+                    <div class="summary-label">Columns Deleted</div>
+                    <div class="summary-value" id="colsDeleted">-</div>
+                    <div class="summary-detail">High missing values</div>
+                </div>
+
+                <div class="summary-card warning">
+                    <div class="summary-label">Values Filled</div>
+                    <div class="summary-value" id="valuesFilled">-</div>
+                    <div class="summary-detail">Mean/Mode imputation</div>
+                </div>
+
+                <div class="summary-card info">
+                    <div class="summary-label">Data Quality</div>
+                    <div class="summary-value" id="dataQuality">-</div>
+                    <div class="summary-detail">Improved</div>
+                </div>
+            </div>
+
+            <!-- Changes Made Section -->
+            <div class="changes-section">
+                <h3 style="margin-top: 0;">✅ Changes Made</h3>
+                <ul class="changes-list" id="changesList">
+                    <!-- Populated by JavaScript -->
+                </ul>
+            </div>
+
+            <!-- Sample Data Section -->
+            <section class="sample-data-section">
+                <h2 class="sample-title">📋 Sample of Cleaned Data (First 7 Rows)</h2>
+                <div class="table-responsive">
+                    <table class="sample-table" id="sampleTable">
+                        <thead>
+                            <!-- Headers populated by JavaScript -->
+                        </thead>
+                        <tbody>
+                            <!-- Data populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="no-data" id="noDataMessage" style="display: none;">
+                    No sample data available
+                </div>
+            </section>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="btn btn-success" id="downloadBtn">
+                    📥 Download Cleaned CSV
+                </button>
+                <button class="btn btn-primary" id="mlTrainBtn">
+                    🤖 Train ML Models
+                </button>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Data Cleaning Tool v1.0 | Results</p>
+        </div>
+    </div>
+
+    <script src="cleaning-results.js"></script>
+    <script src="chatbot-widget.js"></script>
+</body>
+
+</html>
