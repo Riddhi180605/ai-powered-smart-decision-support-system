@@ -1,0 +1,14 @@
+fastapi==0.104.1
+uvicorn==0.24.0
+pandas==2.2.3
+openpyxl==3.1.5
+python-multipart==0.0.6
+openai==1.72.0
+scikit-learn==1.5.2
+shap==0.47.2
+numpy==1.26.4
+matplotlib==3.9.2
+seaborn==0.13.2
+xgboost==2.1.4
+faiss-cpu==1.8.0.post1
+sentence-transformers==3.0.1
